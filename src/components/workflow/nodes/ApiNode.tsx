@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import { Server, ChevronDown, ChevronUp, Lock, Unlock, Plus, X } from 'lucide-react';
+import { Server, ChevronDown, ChevronUp, Lock, Unlock, Plus, X, Save, AlertCircle } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import { ResponseManager } from './api/ResponseManager';
 
 interface FormParam {
   key: string;
   value: string;
   type?: 'text' | 'file';
+}
+
+interface HttpResponse {
+  code: string;
+  description: string;
+  content: string;
 }
 
 interface ApiNodeData {
@@ -25,6 +32,7 @@ interface ApiNodeData {
     type: string;
     token: string;
   };
+  responses: HttpResponse[];
 }
 
 interface ApiNodeProps {
@@ -46,6 +54,7 @@ export function ApiNode({ data }: ApiNodeProps) {
   const [urlEncoded, setUrlEncoded] = useState<FormParam[]>(data.body?.urlEncoded || []);
   const [authType, setAuthType] = useState(data.auth?.type || 'none');
   const [authToken, setAuthToken] = useState(data.auth?.token || '');
+  const [responses, setResponses] = useState<HttpResponse[]>(data.responses || []);
 
   const addParam = () => {
     setParams([...params, { key: '', value: '' }]);
@@ -69,6 +78,11 @@ export function ApiNode({ data }: ApiNodeProps) {
 
   const removeUrlEncoded = (index: number) => {
     setUrlEncoded(urlEncoded.filter((_, i) => i !== index));
+  };
+
+  const handleResponseUpdate = (updatedResponses: HttpResponse[]) => {
+    setResponses(updatedResponses);
+    // Here you would typically update the node data in the parent component
   };
 
   return (
@@ -462,18 +476,7 @@ export function ApiNode({ data }: ApiNodeProps) {
               )}
             </div>
           ) : (
-            <div>
-              <Editor
-                height="300px"
-                defaultLanguage="json"
-                value="{}"
-                options={{
-                  readOnly: true,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                }}
-              />
-            </div>
+            <ResponseManager responses={responses} onUpdate={handleResponseUpdate} />
           )}
         </div>
       )}
