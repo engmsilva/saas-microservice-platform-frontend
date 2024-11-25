@@ -14,7 +14,8 @@ import ReactFlow, {
   Panel,
   useViewport,
   EdgeMouseHandler,
-  DefaultEdgeOptions
+  DefaultEdgeOptions,
+  NodeMouseHandler
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -23,6 +24,7 @@ import { FunctionNode } from './nodes/FunctionNode';
 import { QueueNode } from './nodes/QueueNode';
 import { DatabaseNode } from './nodes/DatabaseNode';
 import { Sidebar } from './Sidebar';
+import { NodeContextMenu } from './NodeContextMenu';
 
 const nodeTypes = {
   apiNode: ApiNode,
@@ -71,11 +73,11 @@ function WorkflowEditorContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [edgeContextMenu, setEdgeContextMenu] = React.useState<{ id: string; x: number; y: number } | null>(null);
+  const [nodeContextMenu, setNodeContextMenu] = React.useState<{ id: string; type: string; data: any; x: number; y: number } | null>(null);
   const reactFlowInstance = useReactFlow();
   const { zoom } = useViewport();
 
   React.useEffect(() => {
-    // Garantir que o zoom seja 100% após o componente montar
     setTimeout(() => {
       reactFlowInstance.setViewport(initialViewport);
     }, 0);
@@ -121,12 +123,56 @@ function WorkflowEditorContent() {
     []
   );
 
+  const onNodeContextMenu: NodeMouseHandler = useCallback(
+    (event, node) => {
+      event.preventDefault();
+      setNodeContextMenu({
+        id: node.id,
+        type: node.type || '',
+        data: node.data,
+        x: event.clientX,
+        y: event.clientY,
+      });
+    },
+    []
+  );
+
   const onDeleteEdge = useCallback(() => {
     if (edgeContextMenu) {
       setEdges((edges) => edges.filter((edge) => edge.id !== edgeContextMenu.id));
       setEdgeContextMenu(null);
     }
   }, [edgeContextMenu, setEdges]);
+
+  const onDeleteNode = useCallback(() => {
+    if (nodeContextMenu) {
+      setNodes((nodes) => nodes.filter((node) => node.id !== nodeContextMenu.id));
+      setEdges((edges) => edges.filter(
+        (edge) => edge.source !== nodeContextMenu.id && edge.target !== nodeContextMenu.id
+      ));
+      setNodeContextMenu(null);
+    }
+  }, [nodeContextMenu, setNodes, setEdges]);
+
+  const onDuplicateNode = useCallback(() => {
+    if (nodeContextMenu) {
+      const originalNode = nodes.find((node) => node.id === nodeContextMenu.id);
+      if (originalNode) {
+        const newNode: Node = {
+          ...originalNode,
+          id: `${originalNode.type}-${Date.now()}`,
+          position: {
+            x: originalNode.position.x + 20,
+            y: originalNode.position.y + 20,
+          },
+          data: { ...originalNode.data },
+          selected: false,
+        };
+        setNodes((nodes) => nodes.concat(newNode));
+      }
+      setNodeContextMenu(null);
+    }
+  }, [nodeContextMenu, nodes, setNodes]);
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -183,6 +229,7 @@ function WorkflowEditorContent() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onEdgeContextMenu={onEdgeContextMenu}
+          onNodeContextMenu={onNodeContextMenu}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           defaultViewport={initialViewport}
@@ -206,6 +253,16 @@ function WorkflowEditorContent() {
             y={edgeContextMenu.y}
             onClose={() => setEdgeContextMenu(null)}
             onDelete={onDeleteEdge}
+          />
+        )}
+
+        {nodeContextMenu && (
+          <NodeContextMenu
+            x={nodeContextMenu.x}
+            y={nodeContextMenu.y}
+            onClose={() => setNodeContextMenu(null)}
+            onDelete={onDeleteNode}
+            onDuplicate={onDuplicateNode}
           />
         )}
       </div>
