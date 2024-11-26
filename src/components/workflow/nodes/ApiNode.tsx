@@ -82,11 +82,10 @@ export function ApiNode({ data }: ApiNodeProps) {
 
   const handleResponseUpdate = (updatedResponses: HttpResponse[]) => {
     setResponses(updatedResponses);
-    // Here you would typically update the node data in the parent component
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 min-w-[250px]">
+    <div className="bg-white rounded-lg shadow-lg border border-gray-200 min-w-[250px] relative">
       <div className="p-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -123,7 +122,7 @@ export function ApiNode({ data }: ApiNodeProps) {
         <div className="p-4">
           <input
             type="text"
-            placeholder="Description"
+            placeholder="Descrição"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-md"
@@ -143,7 +142,7 @@ export function ApiNode({ data }: ApiNodeProps) {
             </select>
             <input
               type="text"
-              placeholder="Enter URL"
+              placeholder="Digite a URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
@@ -226,7 +225,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Key"
+                        placeholder="Chave"
                         value={param.key}
                         onChange={(e) => {
                           const newParams = [...params];
@@ -237,7 +236,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                       />
                       <input
                         type="text"
-                        placeholder="Value"
+                        placeholder="Valor"
                         value={param.value}
                         onChange={(e) => {
                           const newParams = [...params];
@@ -246,13 +245,24 @@ export function ApiNode({ data }: ApiNodeProps) {
                         }}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
                       />
+                      <button
+                        onClick={() => {
+                          const newParams = [...params];
+                          newParams.splice(index, 1);
+                          setParams(newParams);
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded"
+                      >
+                        <X className="w-4 h-4 text-gray-500" />
+                      </button>
                     </div>
                   ))}
                   <button
                     onClick={addParam}
-                    className="text-blue-500 text-sm hover:text-blue-600"
+                    className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                   >
-                    + Add Parameter
+                    <Plus className="w-4 h-4" />
+                    Adicionar Parâmetro
                   </button>
                 </div>
               )}
@@ -263,7 +273,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Key"
+                        placeholder="Chave"
                         value={header.key}
                         onChange={(e) => {
                           const newHeaders = [...headers];
@@ -274,7 +284,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                       />
                       <input
                         type="text"
-                        placeholder="Value"
+                        placeholder="Valor"
                         value={header.value}
                         onChange={(e) => {
                           const newHeaders = [...headers];
@@ -283,13 +293,24 @@ export function ApiNode({ data }: ApiNodeProps) {
                         }}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
                       />
+                      <button
+                        onClick={() => {
+                          const newHeaders = [...headers];
+                          newHeaders.splice(index, 1);
+                          setHeaders(newHeaders);
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded"
+                      >
+                        <X className="w-4 h-4 text-gray-500" />
+                      </button>
                     </div>
                   ))}
                   <button
                     onClick={addHeader}
-                    className="text-blue-500 text-sm hover:text-blue-600"
+                    className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                   >
-                    + Add Header
+                    <Plus className="w-4 h-4" />
+                    Adicionar Header
                   </button>
                 </div>
               )}
@@ -305,7 +326,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                         onChange={(e) => setBodyType(e.target.value)}
                         className="mr-2"
                       />
-                      None
+                      Nenhum
                     </label>
                     <label className="inline-flex items-center">
                       <input
@@ -345,7 +366,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                         <div key={index} className="flex gap-2 items-center">
                           <input
                             type="text"
-                            placeholder="Key"
+                            placeholder="Chave"
                             value={item.key}
                             onChange={(e) => {
                               const newFormData = [...formData];
@@ -363,12 +384,12 @@ export function ApiNode({ data }: ApiNodeProps) {
                             }}
                             className="px-3 py-2 border border-gray-300 rounded-md bg-white"
                           >
-                            <option value="text">Text</option>
-                            <option value="file">File</option>
+                            <option value="text">Texto</option>
+                            <option value="file">Arquivo</option>
                           </select>
                           <input
                             type={item.type === 'file' ? 'file' : 'text'}
-                            placeholder="Value"
+                            placeholder="Valor"
                             onChange={(e) => {
                               const newFormData = [...formData];
                               newFormData[index].value = e.target.value;
@@ -386,9 +407,10 @@ export function ApiNode({ data }: ApiNodeProps) {
                       ))}
                       <button
                         onClick={addFormData}
-                        className="text-blue-500 text-sm hover:text-blue-600"
+                        className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                       >
-                        + Add Form Data
+                        <Plus className="w-4 h-4" />
+                        Adicionar Form Data
                       </button>
                     </div>
                   )}
@@ -399,7 +421,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                         <div key={index} className="flex gap-2 items-center">
                           <input
                             type="text"
-                            placeholder="Key"
+                            placeholder="Chave"
                             value={item.key}
                             onChange={(e) => {
                               const newUrlEncoded = [...urlEncoded];
@@ -410,7 +432,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                           />
                           <input
                             type="text"
-                            placeholder="Value"
+                            placeholder="Valor"
                             value={item.value}
                             onChange={(e) => {
                               const newUrlEncoded = [...urlEncoded];
@@ -429,9 +451,10 @@ export function ApiNode({ data }: ApiNodeProps) {
                       ))}
                       <button
                         onClick={addUrlEncoded}
-                        className="text-blue-500 text-sm hover:text-blue-600"
+                        className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                       >
-                        + Add URL Encoded
+                        <Plus className="w-4 h-4" />
+                        Adicionar URL Encoded
                       </button>
                     </div>
                   )}
@@ -445,6 +468,8 @@ export function ApiNode({ data }: ApiNodeProps) {
                       options={{
                         minimap: { enabled: false },
                         scrollBeyondLastLine: false,
+                        formatOnPaste: true,
+                        formatOnType: true,
                       }}
                     />
                   )}
@@ -458,7 +483,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                     onChange={(e) => setAuthType(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 bg-white"
                   >
-                    <option value="none">No Auth</option>
+                    <option value="none">Sem Autenticação</option>
                     <option value="bearer">Bearer Token</option>
                     <option value="basic">Basic Auth</option>
                     <option value="oauth2">OAuth 2.0</option>
@@ -481,8 +506,22 @@ export function ApiNode({ data }: ApiNodeProps) {
         </div>
       )}
 
-      <Handle type="source" position={Position.Right} id="request" />
-      <Handle type="source" position={Position.Right} id="response" style={{ top: '60%' }} />
+      <div className="absolute right-0 bottom-0 h-[60px] w-[16px] flex flex-col justify-end gap-3 pb-2">
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="request"
+          className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white hover:!bg-blue-600 transition-colors !rounded !right-[-8px]"
+          style={{ bottom: '32px', right: '-8px', top: 'auto' }}
+        />
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="response"
+          className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 transition-colors !rounded !right-[-8px]"
+          style={{ bottom: '8px', right: '-8px', top: 'auto' }}
+        />
+      </div>
     </div>
   );
 }
