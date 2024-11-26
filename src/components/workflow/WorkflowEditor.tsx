@@ -25,6 +25,7 @@ import { QueueNode } from './nodes/QueueNode';
 import { DatabaseNode } from './nodes/DatabaseNode';
 import { Sidebar } from './Sidebar';
 import { NodeContextMenu } from './NodeContextMenu';
+import { useDisableDrop } from '../../hooks/useDisableDrop';
 
 const nodeTypes = {
   apiNode: ApiNode,
@@ -76,6 +77,7 @@ function WorkflowEditorContent() {
   const [nodeContextMenu, setNodeContextMenu] = React.useState<{ id: string; type: string; data: any; x: number; y: number } | null>(null);
   const reactFlowInstance = useReactFlow();
   const { zoom } = useViewport();
+  const { handleDrop, handleDragOver } = useDisableDrop();
 
   React.useEffect(() => {
     setTimeout(() => {
@@ -213,15 +215,14 @@ function WorkflowEditorContent() {
     [reactFlowInstance]
   );
 
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
   return (
     <div className="h-screen flex">
       <Sidebar />
-      <div className="flex-grow relative" onDrop={onDrop} onDragOver={onDragOver}>
+      <div 
+        className="flex-grow relative" 
+        onDrop={(e) => handleDrop(e, onDrop)}
+        onDragOver={handleDragOver}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
