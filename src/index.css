@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+  
+  body {
+    @apply antialiased;
+  }
+
+  .dark .react-flow__controls {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .dark .react-flow__controls-button {
+    @apply border-gray-700 hover:bg-gray-700 text-gray-300;
+    path {
+      @apply fill-gray-300;
+    }
+  }
+
+  .dark .react-flow__minimap {
+    @apply bg-gray-800;
+  }
+
+  .dark .react-flow__attribution {
+    @apply bg-gray-800 text-gray-300;
+  }
+}
