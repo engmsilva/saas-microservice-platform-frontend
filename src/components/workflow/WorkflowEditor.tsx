@@ -57,11 +57,11 @@ const EdgeContextMenu: React.FC<EdgeContextMenuProps> = ({ x, y, onClose, onDele
 
   return (
     <div
-      className="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+      className="fixed bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
       style={{ left: x, top: y }}
     >
       <button
-        className="w-full px-4 py-2 text-left hover:bg-gray-100 text-red-600 text-sm"
+        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400 text-sm"
         onClick={onDelete}
       >
         Delete
@@ -216,13 +216,9 @@ function WorkflowEditorContent() {
   );
 
   return (
-    <div className="h-screen flex">
+    <div className="h-[calc(100vh-4rem)] w-full flex overflow-hidden">
       <Sidebar />
-      <div 
-        className="flex-grow relative" 
-        onDrop={(e) => handleDrop(e, onDrop)}
-        onDragOver={handleDragOver}
-      >
+      <div className="flex-1 relative h-full">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -237,12 +233,15 @@ function WorkflowEditorContent() {
           minZoom={0.1}
           maxZoom={2}
           fitView={false}
+          className="bg-gray-50 dark:bg-gray-900"
+          onDrop={(e) => handleDrop(e, onDrop)}
+          onDragOver={handleDragOver}
         >
           <Background />
-          <Controls />
-          <MiniMap />
+          <Controls className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 [&>button]:border-gray-200 dark:[&>button]:border-gray-700 [&>button]:bg-white dark:[&>button]:bg-gray-800 [&>button:hover]:bg-gray-50 dark:[&>button:hover]:bg-gray-700 [&>button>svg]:text-gray-500 dark:[&>button>svg]:text-gray-400" />
+          <MiniMap className="bg-white dark:bg-gray-800" />
           <Panel position="bottom-right">
-            <div className="bg-white rounded-md shadow-md px-3 py-2 text-sm">
+            <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md shadow-md px-3 py-2 text-sm border border-gray-200 dark:border-gray-700">
               Zoom: {Math.round(zoom * 100)}%
             </div>
           </Panel>
