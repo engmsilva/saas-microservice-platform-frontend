@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import { Server, ChevronDown, ChevronUp, Lock, Unlock, Plus, X, Save, AlertCircle } from 'lucide-react';
+import { Server, ChevronDown, ChevronUp, Lock, Unlock, Plus, X } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { ResponseManager } from './api/ResponseManager';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface FormParam {
   key: string;
@@ -55,6 +56,7 @@ export function ApiNode({ data }: ApiNodeProps) {
   const [authType, setAuthType] = useState(data.auth?.type || 'none');
   const [authToken, setAuthToken] = useState(data.auth?.token || '');
   const [responses, setResponses] = useState<HttpResponse[]>(data.responses || []);
+  const { theme } = useTheme();
 
   const addParam = () => {
     setParams([...params, { key: '', value: '' }]);
@@ -85,33 +87,33 @@ export function ApiNode({ data }: ApiNodeProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 min-w-[250px] relative">
-      <div className="p-3 border-b border-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border-2 border-blue-500 min-w-[250px] relative">
+      <div className="p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Server className="w-5 h-5 text-blue-500" />
-            <span className="font-medium">API</span>
+            <span className="font-medium text-gray-900 dark:text-white">API</span>
           </div>
           <div className="flex items-center gap-2">
             {authType === 'none' ? (
-              <Unlock className="w-4 h-4 text-gray-400" />
+              <Unlock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             ) : (
               <Lock className="w-4 h-4 text-blue-500" />
             )}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 hover:bg-gray-100 rounded"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             >
               {isExpanded ? (
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="w-4 h-4 text-gray-600 dark:text-gray-400" />
               ) : (
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400" />
               )}
             </button>
           </div>
         </div>
         {!isExpanded && (
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             <div>{method} {url}</div>
             {description && <div className="text-xs mt-1">{description}</div>}
           </div>
@@ -122,17 +124,17 @@ export function ApiNode({ data }: ApiNodeProps) {
         <div className="p-4">
           <input
             type="text"
-            placeholder="Descrição"
+            placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full mb-4 px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full mb-4 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
 
           <div className="flex gap-2 mb-4">
             <select
               value={method}
               onChange={(e) => setMethod(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="GET">GET</option>
               <option value="POST">POST</option>
@@ -142,20 +144,20 @@ export function ApiNode({ data }: ApiNodeProps) {
             </select>
             <input
               type="text"
-              placeholder="Digite a URL"
+              placeholder="Enter URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
 
-          <div className="border-b border-gray-200 mb-4">
+          <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
             <div className="flex gap-4">
               <button
                 className={`px-4 py-2 border-b-2 ${
                   activeTab === 'request'
                     ? 'border-blue-500 text-blue-500'
-                    : 'border-transparent'
+                    : 'border-transparent text-gray-600 dark:text-gray-400'
                 }`}
                 onClick={() => setActiveTab('request')}
               >
@@ -165,7 +167,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                 className={`px-4 py-2 border-b-2 ${
                   activeTab === 'response'
                     ? 'border-blue-500 text-blue-500'
-                    : 'border-transparent'
+                    : 'border-transparent text-gray-600 dark:text-gray-400'
                 }`}
                 onClick={() => setActiveTab('response')}
               >
@@ -176,47 +178,20 @@ export function ApiNode({ data }: ApiNodeProps) {
 
           {activeTab === 'request' ? (
             <div>
-              <div className="flex gap-2 mb-4 border-b border-gray-200">
-                <button
-                  className={`px-4 py-2 ${
-                    activeSection === 'params'
-                      ? 'text-blue-500 border-b-2 border-blue-500'
-                      : ''
-                  }`}
-                  onClick={() => setActiveSection('params')}
-                >
-                  Params
-                </button>
-                <button
-                  className={`px-4 py-2 ${
-                    activeSection === 'headers'
-                      ? 'text-blue-500 border-b-2 border-blue-500'
-                      : ''
-                  }`}
-                  onClick={() => setActiveSection('headers')}
-                >
-                  Headers
-                </button>
-                <button
-                  className={`px-4 py-2 ${
-                    activeSection === 'body'
-                      ? 'text-blue-500 border-b-2 border-blue-500'
-                      : ''
-                  }`}
-                  onClick={() => setActiveSection('body')}
-                >
-                  Body
-                </button>
-                <button
-                  className={`px-4 py-2 ${
-                    activeSection === 'auth'
-                      ? 'text-blue-500 border-b-2 border-blue-500'
-                      : ''
-                  }`}
-                  onClick={() => setActiveSection('auth')}
-                >
-                  Auth
-                </button>
+              <div className="flex gap-2 mb-4 border-b border-gray-200 dark:border-gray-700">
+                {['params', 'headers', 'body', 'auth'].map((section) => (
+                  <button
+                    key={section}
+                    className={`px-4 py-2 ${
+                      activeSection === section
+                        ? 'text-blue-500 border-b-2 border-blue-500'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                    onClick={() => setActiveSection(section)}
+                  >
+                    {section.charAt(0).toUpperCase() + section.slice(1)}
+                  </button>
+                ))}
               </div>
 
               {activeSection === 'params' && (
@@ -225,25 +200,25 @@ export function ApiNode({ data }: ApiNodeProps) {
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Chave"
+                        placeholder="Key"
                         value={param.key}
                         onChange={(e) => {
                           const newParams = [...params];
                           newParams[index].key = e.target.value;
                           setParams(newParams);
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       <input
                         type="text"
-                        placeholder="Valor"
+                        placeholder="Value"
                         value={param.value}
                         onChange={(e) => {
                           const newParams = [...params];
                           newParams[index].value = e.target.value;
                           setParams(newParams);
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       <button
                         onClick={() => {
@@ -251,9 +226,9 @@ export function ApiNode({ data }: ApiNodeProps) {
                           newParams.splice(index, 1);
                           setParams(newParams);
                         }}
-                        className="p-2 hover:bg-gray-100 rounded"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       >
-                        <X className="w-4 h-4 text-gray-500" />
+                        <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                       </button>
                     </div>
                   ))}
@@ -262,7 +237,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                     className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                   >
                     <Plus className="w-4 h-4" />
-                    Adicionar Parâmetro
+                    Add Parameter
                   </button>
                 </div>
               )}
@@ -273,25 +248,25 @@ export function ApiNode({ data }: ApiNodeProps) {
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
-                        placeholder="Chave"
+                        placeholder="Key"
                         value={header.key}
                         onChange={(e) => {
                           const newHeaders = [...headers];
                           newHeaders[index].key = e.target.value;
                           setHeaders(newHeaders);
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       <input
                         type="text"
-                        placeholder="Valor"
+                        placeholder="Value"
                         value={header.value}
                         onChange={(e) => {
                           const newHeaders = [...headers];
                           newHeaders[index].value = e.target.value;
                           setHeaders(newHeaders);
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                       <button
                         onClick={() => {
@@ -299,9 +274,9 @@ export function ApiNode({ data }: ApiNodeProps) {
                           newHeaders.splice(index, 1);
                           setHeaders(newHeaders);
                         }}
-                        className="p-2 hover:bg-gray-100 rounded"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       >
-                        <X className="w-4 h-4 text-gray-500" />
+                        <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                       </button>
                     </div>
                   ))}
@@ -310,7 +285,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                     className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                   >
                     <Plus className="w-4 h-4" />
-                    Adicionar Header
+                    Add Header
                   </button>
                 </div>
               )}
@@ -318,47 +293,37 @@ export function ApiNode({ data }: ApiNodeProps) {
               {activeSection === 'body' && (
                 <div>
                   <div className="flex gap-4 mb-4">
-                    <label className="inline-flex items-center">
-                      <input
-                        type="radio"
-                        value="none"
-                        checked={bodyType === 'none'}
-                        onChange={(e) => setBodyType(e.target.value)}
-                        className="mr-2"
-                      />
-                      Nenhum
-                    </label>
-                    <label className="inline-flex items-center">
-                      <input
-                        type="radio"
-                        value="form-data"
-                        checked={bodyType === 'form-data'}
-                        onChange={(e) => setBodyType(e.target.value)}
-                        className="mr-2"
-                      />
-                      Form Data
-                    </label>
-                    <label className="inline-flex items-center">
-                      <input
-                        type="radio"
-                        value="x-www-form-urlencoded"
-                        checked={bodyType === 'x-www-form-urlencoded'}
-                        onChange={(e) => setBodyType(e.target.value)}
-                        className="mr-2"
-                      />
-                      x-www-form-urlencoded
-                    </label>
-                    <label className="inline-flex items-center">
-                      <input
-                        type="radio"
-                        value="json"
-                        checked={bodyType === 'json'}
-                        onChange={(e) => setBodyType(e.target.value)}
-                        className="mr-2"
-                      />
-                      JSON
-                    </label>
+                    {['none', 'form-data', 'x-www-form-urlencoded', 'json'].map((type) => (
+                      <label key={type} className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          value={type}
+                          checked={bodyType === type}
+                          onChange={(e) => setBodyType(e.target.value)}
+                          className="mr-2 text-blue-500"
+                        />
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </span>
+                      </label>
+                    ))}
                   </div>
+
+                  {bodyType === 'json' && (
+                    <Editor
+                      height="200px"
+                      defaultLanguage="json"
+                      value={bodyContent}
+                      onChange={(value) => setBodyContent(value || '')}
+                      theme={theme === 'dark' ? 'vs-dark' : 'light'}
+                      options={{
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        formatOnPaste: true,
+                        formatOnType: true,
+                      }}
+                    />
+                  )}
 
                   {bodyType === 'form-data' && (
                     <div className="space-y-2">
@@ -366,14 +331,14 @@ export function ApiNode({ data }: ApiNodeProps) {
                         <div key={index} className="flex gap-2 items-center">
                           <input
                             type="text"
-                            placeholder="Chave"
+                            placeholder="Key"
                             value={item.key}
                             onChange={(e) => {
                               const newFormData = [...formData];
                               newFormData[index].key = e.target.value;
                               setFormData(newFormData);
                             }}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                           />
                           <select
                             value={item.type}
@@ -382,26 +347,26 @@ export function ApiNode({ data }: ApiNodeProps) {
                               newFormData[index].type = e.target.value as 'text' | 'file';
                               setFormData(newFormData);
                             }}
-                            className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                           >
-                            <option value="text">Texto</option>
-                            <option value="file">Arquivo</option>
+                            <option value="text">Text</option>
+                            <option value="file">File</option>
                           </select>
                           <input
                             type={item.type === 'file' ? 'file' : 'text'}
-                            placeholder="Valor"
+                            placeholder="Value"
                             onChange={(e) => {
                               const newFormData = [...formData];
                               newFormData[index].value = e.target.value;
                               setFormData(newFormData);
                             }}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                           />
                           <button
                             onClick={() => removeFormData(index)}
-                            className="p-2 hover:bg-gray-100 rounded"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                           >
-                            <X className="w-4 h-4 text-gray-500" />
+                            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                           </button>
                         </div>
                       ))}
@@ -410,7 +375,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                         className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                       >
                         <Plus className="w-4 h-4" />
-                        Adicionar Form Data
+                        Add Form Data
                       </button>
                     </div>
                   )}
@@ -421,31 +386,31 @@ export function ApiNode({ data }: ApiNodeProps) {
                         <div key={index} className="flex gap-2 items-center">
                           <input
                             type="text"
-                            placeholder="Chave"
+                            placeholder="Key"
                             value={item.key}
                             onChange={(e) => {
                               const newUrlEncoded = [...urlEncoded];
                               newUrlEncoded[index].key = e.target.value;
                               setUrlEncoded(newUrlEncoded);
                             }}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                           />
                           <input
                             type="text"
-                            placeholder="Valor"
+                            placeholder="Value"
                             value={item.value}
                             onChange={(e) => {
                               const newUrlEncoded = [...urlEncoded];
                               newUrlEncoded[index].value = e.target.value;
                               setUrlEncoded(newUrlEncoded);
                             }}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                           />
                           <button
                             onClick={() => removeUrlEncoded(index)}
-                            className="p-2 hover:bg-gray-100 rounded"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                           >
-                            <X className="w-4 h-4 text-gray-500" />
+                            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                           </button>
                         </div>
                       ))}
@@ -454,24 +419,9 @@ export function ApiNode({ data }: ApiNodeProps) {
                         className="flex items-center gap-1 text-blue-500 text-sm hover:text-blue-600"
                       >
                         <Plus className="w-4 h-4" />
-                        Adicionar URL Encoded
+                        Add URL Encoded
                       </button>
                     </div>
-                  )}
-
-                  {bodyType === 'json' && (
-                    <Editor
-                      height="200px"
-                      defaultLanguage="json"
-                      value={bodyContent}
-                      onChange={(value) => setBodyContent(value || '')}
-                      options={{
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        formatOnPaste: true,
-                        formatOnType: true,
-                      }}
-                    />
                   )}
                 </div>
               )}
@@ -481,9 +431,9 @@ export function ApiNode({ data }: ApiNodeProps) {
                   <select
                     value={authType}
                     onChange={(e) => setAuthType(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 bg-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md mb-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
-                    <option value="none">Sem Autenticação</option>
+                    <option value="none">No Authentication</option>
                     <option value="bearer">Bearer Token</option>
                     <option value="basic">Basic Auth</option>
                     <option value="oauth2">OAuth 2.0</option>
@@ -494,7 +444,7 @@ export function ApiNode({ data }: ApiNodeProps) {
                       placeholder="Bearer Token"
                       value={authToken}
                       onChange={(e) => setAuthToken(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   )}
                 </div>
@@ -511,14 +461,14 @@ export function ApiNode({ data }: ApiNodeProps) {
           type="source"
           position={Position.Right}
           id="request"
-          className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white hover:!bg-blue-600 transition-colors !rounded !right-[-8px]"
+          className="!w-4 !h-4 !bg-blue-500 !border-2 !border-white dark:!border-gray-800 hover:!bg-blue-600 transition-colors !rounded !right-[-8px]"
           style={{ bottom: '32px', right: '-8px', top: 'auto' }}
         />
         <Handle
           type="source"
           position={Position.Right}
           id="response"
-          className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 transition-colors !rounded !right-[-8px]"
+          className="!w-4 !h-4 !bg-green-500 !border-2 !border-white dark:!border-gray-800 hover:!bg-green-600 transition-colors !rounded !right-[-8px]"
           style={{ bottom: '8px', right: '-8px', top: 'auto' }}
         />
       </div>
