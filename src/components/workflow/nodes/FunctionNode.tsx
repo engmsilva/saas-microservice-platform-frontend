@@ -8,6 +8,8 @@ import parserTypeScript from 'prettier/plugins/typescript';
 import estree from 'prettier/plugins/estree';
 import { useDisableDrag } from '../../../hooks/useDisableDrag';
 import { useDisableDrop } from '../../../hooks/useDisableDrop';
+import { useDisablePanning } from '../../../hooks/useDisablePanning';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface FunctionNodeData {
   language: string;
@@ -36,8 +38,10 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
   const [language, setLanguage] = useState(data.language || 'javascript');
   const [code, setCode] = useState(data.code || defaultCode[language]);
   const { setIsDropDisabled } = useDisableDrop();
+  const { theme } = useTheme();
 
   useDisableDrag();
+  useDisablePanning();
 
   const formatCode = useCallback(async () => {
     try {
@@ -63,28 +67,35 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
   }, [setIsDropDisabled]);
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg relative ${isExpanded ? 'w-[500px]' : 'min-w-[250px]'}`}>
-      <div className="p-3 border-b border-gray-200">
+    <div 
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg relative ${isExpanded ? 'w-[500px]' : 'min-w-[250px]'}`}
+      onMouseDown={(e) => {
+        if ((e.target as HTMLElement).closest('.monaco-editor')) {
+          e.stopPropagation();
+        }
+      }}
+    >
+      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Code className="w-5 h-5 text-green-500" />
-            <span className="font-medium">Function</span>
+            <span className="font-medium text-gray-900 dark:text-white">Function</span>
           </div>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
           >
             {isExpanded ? (
-              <ChevronUp className="w-4 h-4" />
+              <ChevronUp className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             ) : (
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             )}
           </button>
         </div>
         {!isExpanded && (
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             <div>{language}</div>
-            <div className="text-xs mt-1 line-clamp-2 font-mono bg-gray-50 p-1 rounded">
+            <div className="text-xs mt-1 line-clamp-2 font-mono bg-gray-50 dark:bg-gray-700 p-1 rounded">
               {code.split('\n')[0]}
             </div>
           </div>
@@ -100,14 +111,14 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
                 setLanguage(e.target.value);
                 setCode(defaultCode[e.target.value]);
               }}
-              className="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+              className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="javascript">JavaScript</option>
               <option value="typescript">TypeScript</option>
             </select>
             <button
               onClick={formatCode}
-              className="px-3 py-1 text-sm bg-green-50 text-green-600 rounded hover:bg-green-100 transition-colors"
+              className="px-3 py-1 text-sm bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-400 rounded hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
             >
               Format Code
             </button>
@@ -119,7 +130,7 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
             onChange={(value) => setCode(value || '')}
             onFocus={handleEditorFocus}
             onBlur={handleEditorBlur}
-            theme="vs-light"
+            theme={theme === 'dark' ? 'vs-dark' : 'light'}
             options={{
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
@@ -141,12 +152,12 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 transition-colors !rounded !left-[-8px]"
+        className="!w-4 !h-4 !bg-green-500 !border-2 !border-white dark:!border-gray-800 hover:!bg-green-600 transition-colors !rounded !left-[-8px]"
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="!w-4 !h-4 !bg-green-500 !border-2 !border-white hover:!bg-green-600 transition-colors !rounded !right-[-8px]"
+        className="!w-4 !h-4 !bg-green-500 !border-2 !border-white dark:!border-gray-800 hover:!bg-green-600 transition-colors !rounded !right-[-8px]"
       />
     </div>
   );
