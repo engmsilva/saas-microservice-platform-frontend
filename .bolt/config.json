@@ -1,3 +1,22 @@
 {
-  "template": "bolt-vite-react-ts"
+  "diffBasedEdits": true,
+  "language": "pt-BR",
+  "features": {
+    "formatOnSave": true,
+    "linting": true
+  },
+  "localization": {
+    "dateFormat": "DD/MM/YYYY",
+    "timeFormat": "HH:mm:ss",
+    "numberFormat": {
+      "decimalSeparator": ",",
+      "thousandsSeparator": ".",
+      "decimalDigits": 2
+    },
+    "currency": {
+      "code": "BRL",
+      "symbol": "R$",
+      "position": "before"
+    }
+  }
 }
