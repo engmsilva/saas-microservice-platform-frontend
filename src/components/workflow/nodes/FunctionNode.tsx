@@ -6,9 +6,6 @@ import prettier from 'prettier/standalone';
 import parserBabel from 'prettier/plugins/babel';
 import parserTypeScript from 'prettier/plugins/typescript';
 import estree from 'prettier/plugins/estree';
-import { useDisableDrag } from '../../../hooks/useDisableDrag';
-import { useDisableDrop } from '../../../hooks/useDisableDrop';
-import { useDisablePanning } from '../../../hooks/useDisablePanning';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 interface FunctionNodeData {
@@ -37,11 +34,7 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [language, setLanguage] = useState(data.language || 'javascript');
   const [code, setCode] = useState(data.code || defaultCode[language]);
-  const { setIsDropDisabled } = useDisableDrop();
   const { theme } = useTheme();
-
-  useDisableDrag();
-  useDisablePanning();
 
   const formatCode = useCallback(async () => {
     try {
@@ -58,24 +51,16 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
     }
   }, [code, language]);
 
-  const handleEditorFocus = useCallback(() => {
-    setIsDropDisabled(true);
-  }, [setIsDropDisabled]);
-
-  const handleEditorBlur = useCallback(() => {
-    setIsDropDisabled(false);
-  }, [setIsDropDisabled]);
-
   return (
     <div 
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg relative ${isExpanded ? 'w-[500px]' : 'min-w-[250px]'}`}
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg border-2 border-green-500 relative ${isExpanded ? 'w-[500px]' : 'min-w-[250px]'}`}
       onMouseDown={(e) => {
         if ((e.target as HTMLElement).closest('.monaco-editor')) {
           e.stopPropagation();
         }
       }}
     >
-      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Code className="w-5 h-5 text-green-500" />
@@ -128,8 +113,6 @@ export function FunctionNode({ data }: { data: FunctionNodeData }) {
             language={language}
             value={code}
             onChange={(value) => setCode(value || '')}
-            onFocus={handleEditorFocus}
-            onBlur={handleEditorBlur}
             theme={theme === 'dark' ? 'vs-dark' : 'light'}
             options={{
               minimap: { enabled: false },
