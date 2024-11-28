@@ -18,6 +18,7 @@ import ReactFlow, {
   NodeMouseHandler
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { toast } from 'sonner';
 
 import { ApiNode } from './nodes/ApiNode';
 import { FunctionNode } from './nodes/FunctionNode';
@@ -25,7 +26,6 @@ import { QueueNode } from './nodes/QueueNode';
 import { DatabaseNode } from './nodes/DatabaseNode';
 import { Sidebar } from './Sidebar';
 import { NodeContextMenu } from './NodeContextMenu';
-import { useDisableDrop } from '../../hooks/useDisableDrop';
 
 const nodeTypes = {
   apiNode: ApiNode,
@@ -77,13 +77,19 @@ function WorkflowEditorContent() {
   const [nodeContextMenu, setNodeContextMenu] = React.useState<{ id: string; type: string; data: any; x: number; y: number } | null>(null);
   const reactFlowInstance = useReactFlow();
   const { zoom } = useViewport();
-  const { handleDrop, handleDragOver } = useDisableDrop();
 
   React.useEffect(() => {
     setTimeout(() => {
       reactFlowInstance.setViewport(initialViewport);
     }, 0);
   }, [reactFlowInstance]);
+
+  const showConnectionError = (message: string) => {
+    toast.error(message, {
+      position: 'bottom-right',
+      duration: 3000,
+    });
+  };
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -93,7 +99,7 @@ function WorkflowEditorContent() {
       if (!sourceNode || !targetNode) return;
 
       if (sourceNode.type === 'apiNode' && targetNode.type !== 'functionNode') {
-        console.warn('API nodes can only connect to Function nodes');
+        showConnectionError('APIs só podem se conectar a Funções para processar suas requisições');
         return;
       }
 
@@ -103,12 +109,12 @@ function WorkflowEditorContent() {
       }
 
       if (sourceNode.type === 'queueNode' && targetNode.type !== 'functionNode') {
-        console.warn('Queue nodes can only connect to Function nodes');
+        showConnectionError('Filas só podem se conectar a Funções para processar suas mensagens');
         return;
       }
 
       if (sourceNode.type === 'databaseNode' && targetNode.type !== 'functionNode') {
-        console.warn('Database nodes can only connect to Function nodes');
+        showConnectionError('Bancos de dados só podem se conectar a Funções para processar suas operações');
         return;
       }
 
@@ -215,6 +221,11 @@ function WorkflowEditorContent() {
     [reactFlowInstance]
   );
 
+  const handleDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
   return (
     <div className="h-[calc(100vh-4rem)] w-full flex overflow-hidden">
       <Sidebar />
@@ -234,7 +245,7 @@ function WorkflowEditorContent() {
           maxZoom={2}
           fitView={false}
           className="bg-gray-50 dark:bg-gray-900"
-          onDrop={(e) => handleDrop(e, onDrop)}
+          onDrop={onDrop}
           onDragOver={handleDragOver}
         >
           <Background />
