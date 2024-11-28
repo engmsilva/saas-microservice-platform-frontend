@@ -1,45 +1,43 @@
 import { useCallback, useEffect } from 'react';
-import { useReactFlow, useStore } from 'reactflow';
+import { useReactFlow } from 'reactflow';
 
 export function useDisablePanning() {
   const { getNodes, setNodes, getViewport, setViewport } = useReactFlow();
-  const store = useStore();
-  
+
   const disablePanning = useCallback(() => {
     // Disable node dragging
     const nodes = getNodes();
-    const updatedNodes = nodes.map(node => ({
+    const updatedNodes = nodes.map((node) => ({
       ...node,
-      draggable: false
+      draggable: false,
     }));
     setNodes(updatedNodes);
 
     // Lock viewport
     const viewport = getViewport();
     setViewport({
-      ...viewport,
-      minZoom: viewport.zoom,
-      maxZoom: viewport.zoom
+      x: viewport.x,
+      y: viewport.y,
+      zoom: viewport.zoom, // Trava o zoom atual
     });
   }, [getNodes, setNodes, getViewport, setViewport]);
 
   const enablePanning = useCallback(() => {
     // Re-enable node dragging
     const nodes = getNodes();
-    const updatedNodes = nodes.map(node => ({
+    const updatedNodes = nodes.map((node) => ({
       ...node,
-      draggable: true
+      draggable: true,
     }));
     setNodes(updatedNodes);
 
     // Reset viewport constraints
-    const viewport = getViewport();
     setViewport({
-      ...viewport,
-      minZoom: 0.1,
-      maxZoom: 2
+      x: 0,
+      y: 0,
+      zoom: 1, // Reset para zoom padrão
     });
-  }, [getNodes, setNodes, getViewport, setViewport]);
+  }, [getNodes, setNodes, setViewport]);
 
   useEffect(() => {
     let isEditing = false;
@@ -47,10 +45,10 @@ export function useDisablePanning() {
 
     const handleEditorInteraction = (event: Event, shouldDisable: boolean) => {
       const target = event.target as HTMLElement;
-      const editorElement = target.closest('.monaco-editor');
-      
+      const editorElement = target.closest('.monaco-editor') as HTMLElement | null;
+
       if (!editorElement) return;
-      
+
       if (shouldDisable && !isEditing) {
         isEditing = true;
         currentEditor = editorElement;
@@ -63,11 +61,11 @@ export function useDisablePanning() {
 
     const handleEditorExit = (event: Event) => {
       const target = event.target as HTMLElement;
-      const relatedTarget = (event as FocusEvent).relatedTarget as HTMLElement;
-      
+      const relatedTarget = (event as FocusEvent).relatedTarget as HTMLElement | null;
+
       // Check if we're moving to another editor element
       if (relatedTarget?.closest('.monaco-editor')) return;
-      
+
       // Only enable if we're actually leaving the editor
       if (currentEditor && (currentEditor.contains(target) || currentEditor === target)) {
         isEditing = false;
@@ -102,7 +100,7 @@ export function useDisablePanning() {
       document.removeEventListener('focusout', handleFocusOut, true);
       document.removeEventListener('keydown', handleKeyDown, true);
 
-      // Make sure to re-enable panning when the component unmounts
+      // Re-enable panning on cleanup
       enablePanning();
     };
   }, [disablePanning, enablePanning]);

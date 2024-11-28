@@ -8,7 +8,7 @@ export function useDisableDrag() {
     const nodes = getNodes();
     const updatedNodes = nodes.map(node => ({
       ...node,
-      draggable: false
+      draggable: false,
     }));
     setNodes(updatedNodes);
   }, [getNodes, setNodes]);
@@ -17,7 +17,7 @@ export function useDisableDrag() {
     const nodes = getNodes();
     const updatedNodes = nodes.map(node => ({
       ...node,
-      draggable: true
+      draggable: true,
     }));
     setNodes(updatedNodes);
   }, [getNodes, setNodes]);
@@ -28,10 +28,10 @@ export function useDisableDrag() {
 
     const handleEditorInteraction = (event: Event, shouldDisable: boolean) => {
       const target = event.target as HTMLElement;
-      const editorElement = target.closest('.monaco-editor');
-      
+      const editorElement = target.closest('.monaco-editor') as HTMLElement | null;
+
       if (!editorElement) return;
-      
+
       if (shouldDisable && !isEditing) {
         isEditing = true;
         currentEditor = editorElement;
@@ -41,11 +41,11 @@ export function useDisableDrag() {
 
     const handleEditorExit = (event: Event) => {
       const target = event.target as HTMLElement;
-      const relatedTarget = (event as FocusEvent).relatedTarget as HTMLElement;
-      
+      const relatedTarget = (event as FocusEvent).relatedTarget as HTMLElement | null;
+
       // Check if we're moving to another editor element
       if (relatedTarget?.closest('.monaco-editor')) return;
-      
+
       // Only enable if we're actually leaving the editor
       if (currentEditor && (currentEditor.contains(target) || currentEditor === target)) {
         isEditing = false;
