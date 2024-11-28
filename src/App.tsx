@@ -2,6 +2,7 @@ import React from 'react';
 import { WorkflowEditor } from './components/workflow/WorkflowEditor';
 import { ThemeToggle } from './components/ThemeToggle';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { Toaster } from 'sonner';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <main>
           <WorkflowEditor />
         </main>
+        <Toaster richColors />
       </div>
     </ThemeProvider>
   );
